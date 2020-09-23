@@ -127,6 +127,7 @@ function App() {
   }, [locations]);
   return (
       <div className="App">
+        <span>This service forwards geocoding requests and caches the results according to the <a href="https://cloud.google.com/maps-platform/terms/maps-service-terms">Maps Api Terms of Service</a></span>
         <header className="App-header">
           <div id="chartdiv" style={{width: "100%", height: "500px"}}></div>
           <button onClick={() => refreshMap()}>refresh map</button>
