@@ -23,9 +23,6 @@ open class GoogleGeoCodingServiceFacade {
 
   @PostConstruct
   open fun init() {
-    if (apiKey == "FIXME") {
-      throw RuntimeException("no system property ")
-    }
     ourContext = Builder().apiKey(apiKey).build()
   }
 
