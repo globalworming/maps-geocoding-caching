@@ -1,5 +1,6 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import './App.css';
+import GoogleLogo from "./powered_by_google_on_non_white_hdpi.png";
 
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4maps from "@amcharts/amcharts4/maps";
@@ -101,12 +102,12 @@ function App() {
 
     titles.forEach(title => {
           if (title.length > 0 && !newLocations.map(it => it.title).includes(title)) {
-            fetch('/geoCode?query=' + encodeURIComponent(title))
+            fetch('/coordinates?query=' + encodeURIComponent(title))
                 .then(response => response.json())
                 .then(response => {
                   if (response.length === 0) return;
-                  let location = response[0].geometry.location;
-                  newLocations.push({title: title, latitude: location.lat, longitude: location.lng, color: colorSet.next()})
+                  let location = response[0];
+                  newLocations.push({title: location.query, latitude:location.latitude, longitude: location.longitude, color: colorSet.next()})
                   setLocations(newLocations)
                 })
           }
@@ -128,8 +129,10 @@ function App() {
   return (
       <div className="App">
         <span>This service forwards geocoding requests and caches the results according to the <a href="https://cloud.google.com/maps-platform/terms/maps-service-terms">Maps Api Terms of Service</a></span>
+        <div>TODO, compliance to https://developers.google.com/maps/documentation/geocoding/policies#terms-privacy</div>
         <header className="App-header">
           <div id="chartdiv" style={{width: "100%", height: "500px"}}></div>
+          <img src={GoogleLogo} alt=""/>
           <button onClick={() => refreshMap()}>refresh map</button>
           <textarea value={titles.join("\n")} onChange={(event => setTitles(event.target.value.split("\n"))) }/>
         </header>

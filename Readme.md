@@ -10,4 +10,4 @@ Displaying maps with pins for specific locations is a common use case. Just put 
 ![Screenshot_20200831_150725.png](Screenshot_20200831_150725.png)
  
  
- 
+todo, create specific api key, restrict to azurewebsites, https://developers.google.com/maps/api-key-best-practices#best_practice_list 

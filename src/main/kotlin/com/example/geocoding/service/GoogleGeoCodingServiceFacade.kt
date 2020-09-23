@@ -1,9 +1,9 @@
 package com.example.geocoding.service
 
+import com.example.geocoding.model.CoordinateResult
 import com.google.maps.GeoApiContext
 import com.google.maps.GeoApiContext.*
 import com.google.maps.GeocodingApi
-import com.google.maps.model.GeocodingResult
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -19,22 +19,27 @@ open class GoogleGeoCodingServiceFacade {
   @Value("\${maps.api.key}")
   private lateinit var apiKey: String
 
-  private lateinit var context: GeoApiContext
+  private lateinit var ourContext: GeoApiContext
 
   @PostConstruct
   open fun init() {
     if (apiKey == "FIXME") {
-      throw RuntimeException("enter you api keys into the application.properties, see https://developers.google.com/maps/documentation/geocoding/get-api-key")
+      throw RuntimeException("no system property ")
     }
-    context = Builder().apiKey(apiKey).build()
+    ourContext = Builder().apiKey(apiKey).build()
   }
 
 
   @Cacheable(cacheName)
-  open fun coordinates(query: String): Array<GeocodingResult> {
-    return GeocodingApi.geocode(context, query).await()
+  open fun coordinates(query: String, apiKey: String?): Array<CoordinateResult> {
+    val apiContext = if (apiKey != null) apiContext(apiKey) else ourContext;
+    return GeocodingApi.geocode(apiContext, query).await()
+        .map {CoordinateResult.from(query, it)}
+        .toTypedArray()
   }
 
+  @Cacheable("apiContext")
+  open fun apiContext(apiKey: String): GeoApiContext = Builder().apiKey(apiKey).build()
 
 
 }

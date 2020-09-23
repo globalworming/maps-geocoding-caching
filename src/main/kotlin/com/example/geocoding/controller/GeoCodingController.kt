@@ -13,9 +13,10 @@ class GeoCodingController {
   @Autowired
   private lateinit var googleGeoCodingServiceFacade: GoogleGeoCodingServiceFacade
 
-  @GetMapping("/geoCode")
-  fun geoCode(@RequestParam query: String) =
-      googleGeoCodingServiceFacade.coordinates(query)
+  // TODO bulk request?
+  @GetMapping("/coordinates")
+  fun coordinates(@RequestParam query: String, @RequestParam(required=false) apiKey: String?) =
+      googleGeoCodingServiceFacade.coordinates(query, apiKey)
 
 
 }
