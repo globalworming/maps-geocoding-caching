@@ -93,10 +93,9 @@ const initialLocations = [{
   "longitude": 12.5681,
   "color": colorSet.next()
 }, {
-  "query": "North Pole",
-  "placeId": "ChIJUbkVldpEk08RdojG1cTQGEU",
-  "latitude": 89.99999989999999,
-  "longitude": -135,
+  "query": "bermuda triangle",
+  "latitude": 25,
+  "longitude": -71,
   "color": colorSet.next()
 }];
 
@@ -163,7 +162,8 @@ function App() {
           </pre>
           <p>your API key is sent securely (check https) and may be stored in memory for faster service. We don't do
             anything else with it than forwarding it to the google maps api. See also: <a
-                href="https://developers.google.com/maps/api-key-best-practices#best_practice_list">maps/api-key-best-practices#best_practice_list</a></p>
+                href="https://developers.google.com/maps/api-key-best-practices#best_practice_list">maps/api-key-best-practices#best_practice_list</a>
+          </p>
         </div>
 
         <div className="App">
@@ -172,7 +172,8 @@ function App() {
                  style={{width: "90%", height: "500px", maxWidth: "900px", border: "1px solid #CCC"}}></div>
             <img src={GoogleLogo} alt=""/>
             <button onClick={() => refreshMap()}>refresh map</button>
-            <textarea style={{minHeight: "4rem"}} value={queries.join("\n")} onChange={(event => setQueries(event.target.value.split("\n")))}/>
+            <textarea style={{minHeight: "4rem"}} value={queries.join("\n")}
+                      onChange={(event => setQueries(event.target.value.split("\n")))}/>
           </header>
         </div>
       </>
