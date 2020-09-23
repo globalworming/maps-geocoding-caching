@@ -55,7 +55,7 @@ class Cache2kAndCachableAnnotationIT {
     admin = Actor("admin")
     admin.can(ManageTheCache(cacheManager))
     apiUser.can(UseTheGeoCoder(googleGeoCodingServiceFacade))
-    Mockito.`when`(googleGeoCodingServiceFacade.geoCode(anyString()))
+    Mockito.`when`(googleGeoCodingServiceFacade.coordinates(anyString()))
         .thenAnswer { uniqueGeoCodingResult(it.arguments[0] as String) }
   }
 

@@ -10,7 +10,7 @@ open class RequestGeoCode(var query: String?) : Performable {
   @Step("{0} requests geocoding for \"#query\"")
   override fun <T : Actor> performAs(actor: T) {
     actor.remember("latest query", query)
-    actor.remember("latest response", UseTheGeoCoder.`as`(actor).googleGeoCodingServiceFacade.geoCode(query!!))
+    actor.remember("latest response", UseTheGeoCoder.`as`(actor).googleGeoCodingServiceFacade.coordinates(query!!))
   }
 
   companion object {

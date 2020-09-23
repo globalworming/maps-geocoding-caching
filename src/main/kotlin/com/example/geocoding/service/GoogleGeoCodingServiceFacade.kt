@@ -12,6 +12,10 @@ import javax.annotation.PostConstruct
 @Service
 open class GoogleGeoCodingServiceFacade {
 
+  companion object {
+    const val cacheName = "geoCodingResults"
+  }
+
   @Value("\${maps.api.key}")
   private lateinit var apiKey: String
 
@@ -26,8 +30,8 @@ open class GoogleGeoCodingServiceFacade {
   }
 
 
-  @Cacheable("geoCodingResults")
-  open fun geoCode(query: String): Array<GeocodingResult> {
+  @Cacheable(cacheName)
+  open fun coordinates(query: String): Array<GeocodingResult> {
     return GeocodingApi.geocode(context, query).await()
   }
 

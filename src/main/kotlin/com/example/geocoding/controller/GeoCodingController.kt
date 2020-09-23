@@ -15,7 +15,7 @@ class GeoCodingController {
 
   @GetMapping("/geoCode")
   fun geoCode(@RequestParam query: String) =
-      googleGeoCodingServiceFacade.geoCode(query)
+      googleGeoCodingServiceFacade.coordinates(query)
 
 
 }
