@@ -5,7 +5,7 @@
 
     <groupId>com.example</groupId>
     <artifactId>geo-coding</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.0.Final</version>
     <packaging>jar</packaging>
 
     <name>geoCoding</name>
