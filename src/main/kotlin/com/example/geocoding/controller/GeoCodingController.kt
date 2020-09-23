@@ -2,6 +2,7 @@ package com.example.geocoding.controller
 
 import com.example.geocoding.model.CoordinateResult
 import com.example.geocoding.service.GoogleGeoCodingServiceFacade
+import com.google.maps.errors.RequestDeniedException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,6 +27,8 @@ class GeoCodingController {
         if (it.contains("API key")) throw ResponseStatusException(HttpStatus.BAD_REQUEST, e.message, e)
       }
       throw e
+    } catch (e: RequestDeniedException) {
+      throw ResponseStatusException(HttpStatus.FORBIDDEN, e.message, e)
     }
 
   }

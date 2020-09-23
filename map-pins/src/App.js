@@ -15,7 +15,6 @@ am4core.useTheme(am4themes_animated);
 // Themes end
 
 const renderChart = (locations) => {
-  console.log("render chart", locations)
   // Create map instance
   let chart = am4core.create("chartdiv", am4maps.MapChart);
 
@@ -47,7 +46,7 @@ const renderChart = (locations) => {
   let imageSeries = chart.series.push(new am4maps.MapImageSeries());
   imageSeries.mapImages.template.propertyFields.longitude = "longitude";
   imageSeries.mapImages.template.propertyFields.latitude = "latitude";
-  imageSeries.mapImages.template.tooltipText = "{title}";
+  imageSeries.mapImages.template.tooltipText = "{query}";
   imageSeries.mapImages.template.propertyFields.url = "url";
 
   let circle = imageSeries.mapImages.template.createChild(am4core.Circle);
@@ -59,14 +58,18 @@ const renderChart = (locations) => {
   circle2.propertyFields.fill = "color";
 
 
-  circle2.events.on("inited", function(event){
+  circle2.events.on("inited", function (event) {
     animateBullet(event.target);
-  })
+  });
 
 
   function animateBullet(circle) {
-    let animation = circle.animate([{ property: "scale", from: 1, to: 5 }, { property: "opacity", from: 1, to: 0 }], 1000, am4core.ease.circleOut);
-    animation.events.on("animationended", function(event){
+    let animation = circle.animate([{property: "scale", from: 1, to: 5}, {
+      property: "opacity",
+      from: 1,
+      to: 0
+    }], 1000, am4core.ease.circleOut);
+    animation.events.on("animationended", function (event) {
       animateBullet(event.target.object);
     })
   }
@@ -75,68 +78,104 @@ const renderChart = (locations) => {
   imageSeries.data = locations;
 
   return chart;
-}
+};
 
 const colorSet = new am4core.ColorSet();
 
-const initialLocations = [ {
-  "title": "Brussels",
+const initialLocations = [{
+  "query": "Brussels",
   "latitude": 50.8371,
   "longitude": 4.3676,
-  "color":colorSet.next()
+  "color": colorSet.next()
 }, {
-  "title": "Copenhagen",
+  "query": "Copenhagen",
   "latitude": 55.6763,
   "longitude": 12.5681,
-  "color":colorSet.next()
-} ];
+  "color": colorSet.next()
+}, {
+  "query": "North Pole",
+  "placeId": "ChIJUbkVldpEk08RdojG1cTQGEU",
+  "latitude": 89.99999989999999,
+  "longitude": -135,
+  "color": colorSet.next()
+}];
 
 function App() {
-  const chart = useRef(null);
-  const [locations, setLocations] = useState(initialLocations)
-  const [titles, setTitles] = useState(initialLocations.map(item => item.title))
+  let chart = useRef(null).current;
+  const [locations, setLocations] = useState(initialLocations);
+  const [queries, setQueries] = useState(initialLocations.map(item => item.query));
 
   const refreshMap = () => {
-    let newLocations = Object.assign([], locations)
-    newLocations = newLocations.filter(it => titles.includes(it.title))
+    let newLocations = Object.assign([], locations);
+    newLocations = newLocations.filter(it => queries.includes(it.query));
 
-    titles.forEach(title => {
-          if (title.length > 0 && !newLocations.map(it => it.title).includes(title)) {
-            fetch('/coordinates?query=' + encodeURIComponent(title))
+    queries.forEach(query => {
+          if (query.length > 0 && !newLocations.map(it => it.query).includes(query)) {
+            fetch('/coordinates?query=' + encodeURIComponent(query))
                 .then(response => response.json())
                 .then(response => {
                   if (response.length === 0) return;
                   let location = response[0];
-                  newLocations.push({title: location.query, latitude:location.latitude, longitude: location.longitude, color: colorSet.next()})
+                  newLocations.push({
+                    query: location.query,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    color: colorSet.next()
+                  });
                   setLocations(newLocations)
                 })
           }
         }
-
     )
-
-    //return {title: it, latitude: location.lat, longitude: location.lng, color: colorSet.next()}
-    //console.log(JSON.stringify(newLocations, null, 2));
-    //setLocations(newLocations)
-  }
+  };
 
   useLayoutEffect(() => {
-    chart.current = renderChart(locations);
+    chart = renderChart(locations);
     return () => {
-      chart.current.dispose();
+      chart.dispose();
     };
   }, [locations]);
-  return (
-      <div className="App">
-        <span>This service forwards geocoding requests and caches the results according to the <a href="https://cloud.google.com/maps-platform/terms/maps-service-terms">Maps Api Terms of Service</a></span>
-        <div>TODO, compliance to https://developers.google.com/maps/documentation/geocoding/policies#terms-privacy</div>
-        <header className="App-header">
-          <div id="chartdiv" style={{width: "100%", height: "500px"}}></div>
-          <img src={GoogleLogo} alt=""/>
-          <button onClick={() => refreshMap()}>refresh map</button>
-          <textarea value={titles.join("\n")} onChange={(event => setTitles(event.target.value.split("\n"))) }/>
-        </header>
-      </div>
+  return (<>
+        <div style={{padding: "2rem"}}>
+          <p>This service forwards geocoding requests and caches the results according to the <a
+              href="https://cloud.google.com/maps-platform/terms/maps-service-terms">Maps Api Terms of Service</a> which
+            at the time of writing this allows latitude and longitude values to be cached up to 30 days, and placeId
+            indefinitely. Source on <a href="https://github.com/globalworming/maps-geocoding-caching">GitHub</a></p>
+          <p>TODO: make this page compliant to compliance to
+            https://developers.google.com/maps/documentation/geocoding/policies#terms-privacy</p>
+          <p>Usage is pretty simple: get a <a
+              href="https://developers.google.com/maps/documentation/geocoding/get-api-key">maps geocoding API key</a>,
+            then</p>
+          <pre style={{
+            padding: "0.5rem",
+            background: "#CCC",
+            fontFamily: "monospace"
+          }}>REQUEST GET /coordinates?query=North%20Pole&apiKey=YOUR_API_KEY<br/>
+            <br/>RESPONSE:<br/>
+            {JSON.stringify([
+              {
+                "query": "North Pole",
+                "placeId": "ChIJUbkVldpEk08RdojG1cTQGEU",
+                "latitude": 89.99999989999999,
+                "longitude": -135
+              }
+            ], undefined, 2)}
+          </pre>
+          <p>your API key is sent securely (check https) and may be stored in memory for faster service. We don't do
+            anything else with it than forwarding it to the google maps api. See also: <a
+                href="https://developers.google.com/maps/api-key-best-practices#best_practice_list">maps/api-key-best-practices#best_practice_list</a></p>
+        </div>
+
+        <div className="App">
+          <header className="App-header">
+            <div id="chartdiv"
+                 style={{width: "90%", height: "500px", maxWidth: "900px", border: "1px solid #CCC"}}></div>
+            <img src={GoogleLogo} alt=""/>
+            <button onClick={() => refreshMap()}>refresh map</button>
+            <textarea style={{minHeight: "4rem"}} value={queries.join("\n")} onChange={(event => setQueries(event.target.value.split("\n")))}/>
+          </header>
+        </div>
+      </>
   );
 }
 

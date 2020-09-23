@@ -4,6 +4,7 @@ import com.example.geocoding.model.CoordinateResult
 import com.google.maps.GeoApiContext
 import com.google.maps.GeoApiContext.*
 import com.google.maps.GeocodingApi
+import com.google.maps.errors.RequestDeniedException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
@@ -28,6 +29,7 @@ open class GoogleGeoCodingServiceFacade {
 
 
   @Cacheable(cacheName)
+  @Throws(RequestDeniedException::class)
   open fun coordinates(query: String, apiKey: String?): Array<CoordinateResult> {
     val apiContext = if (apiKey != null) apiContext(apiKey) else ourContext;
     return GeocodingApi.geocode(apiContext, query).await()
